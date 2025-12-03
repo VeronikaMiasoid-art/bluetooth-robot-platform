@@ -1,4 +1,3 @@
-# motors_pigpio.py
 import pigpio
 import time
 
@@ -38,7 +37,7 @@ class L298NDriver:
 
         self.stop(hard=True)
 
-    # ---------- низькорівневі сетери ----------
+    #  низькорівневі сетери 
     def _set_left_dir(self, d):
         if self.invert_left:
             d = -d
@@ -71,7 +70,7 @@ class L298NDriver:
         self.pi.set_PWM_dutycycle(self.ENB, sp)
         self.right_speed = sp
 
-    # ---------- базові команди ----------
+    #  базові команди 
     def set_left(self, direction, speed):
         """direction: -1/0/1, speed: 0..255"""
         self._set_left_dir(direction)
@@ -121,7 +120,7 @@ class L298NDriver:
             self._set_left_dir(0)
             self._set_right_dir(0)
 
-    # ---------- рухи для платформи ----------
+    #  рухи для платформи 
     def forward(self, speed=180, ramp_time=0.8):
         self.ramp(1, 1, speed, ramp_time=ramp_time)
 

@@ -1,8 +1,5 @@
-# ===== Піни L298N (BCM) =====
-# Лівий мотор: IN1 (білий) -> GPIO17, IN2 (зелений) -> GPIO27
-# Правий мотор: IN3 (фіолетовий) -> GPIO22, IN4 (помаранчевий) -> GPIO23
-IN1, IN2 = 17, 27   # ЛІВЕ колесо (інвертуємо логіку)
-IN3, IN4 = 22, 23   # ПРАВЕ колесо
+IN1, IN2 = 17, 27  
+IN3, IN4 = 22, 23   
 
 import RPi.GPIO as GPIO
 import time
@@ -10,7 +7,7 @@ import time
 GPIO.setmode(GPIO.BCM)
 GPIO.setup([IN1, IN2, IN3, IN4], GPIO.OUT, initial=GPIO.LOW)
 
-# --- БАЗОВІ ДІЇ ---
+#  БАЗОВІ ДІЇ 
 def stop():
     GPIO.output(IN1, GPIO.LOW)
     GPIO.output(IN2, GPIO.LOW)
@@ -19,15 +16,15 @@ def stop():
 
 # Вперед: ЛІВЕ інвертоване, ПРАВЕ звичайне
 def forward():
-    GPIO.output(IN1, GPIO.LOW)   # було HIGH
-    GPIO.output(IN2, GPIO.HIGH)  # було LOW
+    GPIO.output(IN1, GPIO.LOW)   
+    GPIO.output(IN2, GPIO.HIGH) 
     GPIO.output(IN3, GPIO.HIGH)
     GPIO.output(IN4, GPIO.LOW)
 
 # Назад: ЛІВЕ інвертоване, ПРАВЕ звичайне
 def backward():
-    GPIO.output(IN1, GPIO.HIGH)  # було LOW
-    GPIO.output(IN2, GPIO.LOW)   # було HIGH
+    GPIO.output(IN1, GPIO.HIGH)  
+    GPIO.output(IN2, GPIO.LOW)   
     GPIO.output(IN3, GPIO.LOW)
     GPIO.output(IN4, GPIO.HIGH)
 
@@ -46,7 +43,7 @@ def turn_right():
     GPIO.output(IN3, GPIO.LOW)
     GPIO.output(IN4, GPIO.HIGH)
 
-# --- Невеликий CLI-тест (необов'язково) ---
+#  CLI-тест 
 if __name__ == "__main__":
     try:
         print("w – вперед | s – назад | a – вліво | d – вправо | x – стоп | q – вихід")

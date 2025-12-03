@@ -4,8 +4,8 @@ import time
 import os
 import struct
 
-# --- UPS MONITORING SECTION ----------------
-# --- UPS HAT 18306: обережне читання з ретраями ---
+#  UPS MONITORING SECTION 
+#  UPS HAT 18306: обережне читання з ретраями 
 import smbus2
 
 UPS_I2C_BUS = 1
@@ -17,7 +17,6 @@ def _ups_read_block_safe(cmd=0x00, length=32, retries=3, delay=0.05):
     try:
         for _ in range(retries):
             try:
-                # багато цих HAT адекватно відповідають на read_i2c_block_data(0x00, len)
                 data = bus.read_i2c_block_data(UPS_ADDR, cmd, length)
                 return data
             except OSError as e:
@@ -27,25 +26,15 @@ def _ups_read_block_safe(cmd=0x00, length=32, retries=3, delay=0.05):
         bus.close()
 
 def read_ups_status():
-    """
-    Повертає (voltage_v, percent, power_text).
-    Якщо твій окремий скрипт показував інші поля — можеш підмінити тут парсинг тим кодом.
-    """
     raw = _ups_read_block_safe(0x00, 32, retries=5, delay=0.1)
-
-    # Приклад простого парсингу як у твоїх попередніх тестах:
-    # raw виглядає на кшталт [57, 159, 255, 255, 255, 255, 255, 255]
-    # беремо перші 2 байти як «сирий вольтаж» (умовно) і масштабуємо
     if len(raw) >= 2:
-        raw_mv = (raw[0] << 8) | raw[1]   # умовне перетворення, підігнане під те що ми бачили
+        raw_mv = (raw[0] << 8) | raw[1]  
         voltage = round( raw_mv / 390.0 , 2)  # підбір масштабу під ~14.7 V, щоб збігалося з твоїм скриптом
     else:
         voltage = 0.0
 
-    # Відсоток батареї: якщо твій робочий `ups_full_monitor.py` вже вмів рахувати — встав його формулу тут.
     percent = 98.0  # placeholder, щоб не падало; заміни своєю логікою з робочого скрипта
 
-    # Стан живлення: зовнішнє/заряд/акум — за бажанням з твого скрипта
     power_text = "External Power (charging?)"
 
     return voltage, percent, power_text
@@ -53,11 +42,11 @@ def read_ups_status():
 def ups_menu_action():
     try:
         v, p, t = read_ups_status()
-        print(f"🔋 UPS: {v:.2f} V | Battery: {p:.1f}% | Power: {t}")
+        print(f"UPS: {v:.2f} V | Battery: {p:.1f}% | Power: {t}")
     except Exception as e:
-        print(f"❌ Помилка читання UPS: {e}")
+        print(f"Помилка читання UPS: {e}")
 
-# --- MOTOR CONTROL SECTION -----------------
+#  MOTOR CONTROL SECTION 
 IN1, IN2, IN3, IN4 = 17, 18, 22, 23
 
 GPIO.setmode(GPIO.BCM)
@@ -66,44 +55,44 @@ for pin in (IN1, IN2, IN3, IN4):
     GPIO.setup(pin, GPIO.OUT)
     GPIO.output(pin, 0)
 
-# --- MOTOR FUNCTIONS -----------------------
+#  MOTOR FUNCTIONS 
 def forward():
     GPIO.output(IN1, 1)
     GPIO.output(IN2, 0)
     GPIO.output(IN3, 1)
     GPIO.output(IN4, 0)
-    print("⬆️ Moving forward")
+    print("Moving forward")
 
 def backward():
     GPIO.output(IN1, 0)
     GPIO.output(IN2, 1)
     GPIO.output(IN3, 0)
     GPIO.output(IN4, 1)
-    print("⬇️ Moving backward")
+    print("Moving backward")
 
 def left():
     GPIO.output(IN1, 0)
     GPIO.output(IN2, 1)
     GPIO.output(IN3, 1)
     GPIO.output(IN4, 0)
-    print("⬅️ Turning left")
+    print("Turning left")
 
 def right():
     GPIO.output(IN1, 1)
     GPIO.output(IN2, 0)
     GPIO.output(IN3, 0)
     GPIO.output(IN4, 1)
-    print("➡️ Turning right")
+    print("Turning right")
 
 def stop():
     for pin in (IN1, IN2, IN3, IN4):
         GPIO.output(pin, 0)
-    print("🛑 Stopped")
+    print("Stopped")
 
-# --- UPS MONITORING FUNCTION ---------------
+#  UPS MONITORING FUNCTION 
 def read_ups_status():
     if not UPS_AVAILABLE:
-        print("⚠️ SMBus не знайдено. UPS-моніторинг вимкнено.")
+        print("SMBus не знайдено. UPS-моніторинг вимкнено.")
         return
 
     try:
@@ -123,17 +112,17 @@ def read_ups_status():
         # Перевірка, чи йде зарядка (через 5V GPIO)
         power_status = "🔌 External Power (charging)" if os.path.exists("/sys/class/power_supply") else "🔋 On Battery"
 
-        print(f"\n🔋 UPS STATUS:")
+        print(f"UPS STATUS:")
         print(f"Voltage: {voltage:.2f} V")
         print(f"Battery: {capacity:.1f}%")
         print(f"Power:   {power_status}\n")
 
     except Exception as e:
-        print("❌ Помилка читання UPS:", e)
+        print("Помилка читання UPS:", e)
 
-# --- TEST MOTOR FUNCTION -------------------
+#  TEST MOTOR FUNCTION 
 def test_motors():
-    print("\n🚗 Тестування моторів...")
+    print("Тестування моторів...")
     forward()
     time.sleep(1)
     backward()
@@ -143,14 +132,11 @@ def test_motors():
     right()
     time.sleep(1)
     stop()
-    print("✅ Тест завершено.\n")
+    print("Тест завершено.\n")
 
-# --- KEYBOARD CONTROL MODE -----------------def keyboard_control():
-    # --- Keyboard over SSH/terminal (без бібліотеки keyboard) ---
 import sys, termios, tty, select, time
 
 def _getch_nonblocking(timeout=0.1):
-    """Повертає 1 символ з клавіатури без Enter, або None якщо нічого не натиснули."""
     fd = sys.stdin.fileno()
     old = termios.tcgetattr(fd)
     try:
@@ -164,7 +150,7 @@ def _getch_nonblocking(timeout=0.1):
         termios.tcsetattr(fd, termios.TCSADRAIN, old)
 
 def keyboard_control():
-    print("\n🎮 Режим керування з клавіатури:")
+    print("Режим керування з клавіатури:")
     print("W - вперед | S - назад | A - вліво | D - вправо | X - стоп | Q - вихід")
     try:
         while True:
@@ -184,21 +170,21 @@ def keyboard_control():
                 stop()
             elif key == 'q':
                 stop()
-                print("🚪 Вихід з режиму керування.")
+                print("Вихід з режиму керування.")
                 break
     except KeyboardInterrupt:
         stop()
 
-# --- MAIN MENU -----------------------------
+#  MAIN MENU 
 def main_menu():
     while True:
-        print("\n=== 🤖 ROBOT CONTROL MENU ===")
-        print("1️⃣  Тест моторів")
-        print("2️⃣  Керування з клавіатури")
-        print("3️⃣  Перевірити стан UPS")
-        print("4️⃣  Вихід")
+        print(" ROBOT CONTROL MENU ")
+        print("1️ Тест моторів")
+        print("2️  Керування з клавіатури")
+        print("3️  Перевірити стан UPS")
+        print("4️  Вихід")
 
-        choice = input("➡️  Обери режим: ")
+        choice = input(" Обери режим: ")
 
         if choice == '1':
             test_motors()
@@ -209,15 +195,15 @@ def main_menu():
         elif choice == '4':
             break
         else:
-            print("❌ Невірний вибір. Спробуй ще раз.")
+            print("Невірний вибір. Спробуй ще раз.")
 
     GPIO.cleanup()
-    print("🔌 GPIO очищено. Програма завершена.")
+    print("GPIO очищено. Програма завершена.")
 
-# --- START ---------------------------------
+#  START 
 if __name__ == "__main__":
     try:
         main_menu()
     except KeyboardInterrupt:
         GPIO.cleanup()
-        print("\n🛑 Примусове завершення.")
+        print(" Примусове завершення.")

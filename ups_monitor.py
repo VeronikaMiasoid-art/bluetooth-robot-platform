@@ -18,7 +18,7 @@ def get_voltage(data):
     voltage = voltage_raw / 1000.0  # переводимо у вольти
     return voltage
 
-print("🔋 UPS HAT 18306 Monitor\n")
+print("UPS HAT 18306 Monitor\n")
 
 for i in range(5):
     raw = read_raw_data()
@@ -30,4 +30,4 @@ for i in range(5):
         print("No data.")
     time.sleep(1)
 
-print("\n✅ Done.")
+print("Done.")

@@ -1,9 +1,6 @@
 # bt_car_server.py
 import time
 from motors_pigpio import L298NDriver
-
-# Для SPP потрібен PyBluez:
-# sudo apt install -y bluetooth python3-bluez
 import bluetooth
 
 driver = L298NDriver(

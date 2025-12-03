@@ -2,7 +2,7 @@ import smbus
 import time
 
 # IP5306 I2C address
-IP5306_ADDR = 0x75  # іноді 0x75 або 0x42, перевіримо обидва варіанти
+IP5306_ADDR = 0x75  
 bus = smbus.SMBus(1)
 
 def read_register(addr, reg):
@@ -36,7 +36,7 @@ def get_power_status(addr):
     if data & 0x10:
         return "⚡ External Power (charging)"
     else:
-        return "🔋 Battery mode"
+        return "Battery mode"
 
 # ---- main loop ----
 for address in [0x42, 0x75]:
@@ -51,4 +51,4 @@ for address in [0x42, 0x75]:
 else:
     print("⚠️ No UPS found at 0x42 or 0x75")
 
-print("✅ Done.")
+print("Done.")

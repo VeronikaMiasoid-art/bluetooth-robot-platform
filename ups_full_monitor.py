@@ -21,9 +21,9 @@ def get_status(data):
     if data[1] > 200:
         return "⚡ Charging (external power)"
     elif data[1] < 150:
-        return "🔋 Battery mode"
+        return "Battery mode"
     else:
-        return "⚙️ Unknown"
+        return "Unknown"
 
 def get_battery_percent(voltage):
     # 12.0V — майже розряджено, 14.8V — повністю заряджено
@@ -31,13 +31,13 @@ def get_battery_percent(voltage):
     percent = max(0, min(100, percent))
     return percent
 
-print("🔋 UPS HAT 18306 — Live Monitor\n")
+print("UPS HAT 18306 — Live Monitor\n")
 
 try:
     while True:
         data = read_raw()
         if not data:
-            print("❌ UPS not responding.")
+            print("UPS not responding.")
             time.sleep(2)
             continue
 
@@ -50,4 +50,4 @@ try:
         time.sleep(2)
 
 except KeyboardInterrupt:
-    print("\n🛑 Monitoring stopped.")
+    print("Monitoring stopped.")
